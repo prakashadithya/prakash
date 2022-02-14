@@ -1,0 +1,1 @@
+invoke-command -Scriptblock {get-process} -Computername "blwpprint01ocb","blwpprint02ocb","blwpprint01us1","blwpprint02us1","blwwprint01ocb","blwwprint02ocb","blwwprint01us1","blwwprint02us1" | Where-object {($_.name -like "PrintApiWinService")} | format-table pscomputername,name,starttime

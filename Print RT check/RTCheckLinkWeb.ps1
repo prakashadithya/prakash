@@ -1,0 +1,1 @@
+invoke-command -Scriptblock {get-process} -Computername "blwprt01ocb","blwprt02ocb","blwprt03ocb","blwprt04ocb","blwprt05ocb","blwprt06ocb","blwprt01us1","blwprt02us1","blwprt03us1","blwprt04us1","blwprt05us1","blwprt06us1" | Where-object {($_.name -like "RTBETAHOSTAccessSvr")} | format-table pscomputername,name,starttime
