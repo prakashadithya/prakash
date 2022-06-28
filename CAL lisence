@@ -1,0 +1,44 @@
+ 
+
+<#
+ 
+.SYNOPSIS       
+    Name : Report to checek CAL license 
+    Description : To check if Java is installed, Check Apache and Pivotal Service and to get JAVA versions
+   
+#>
+
+
+#Script to pull number of days 
+
+#cutomer, envn (sce-val, genmab, instance id, reseting call license), 
+#setting up the alarm
+#actual alarm
+#alert in teamworks
+#cal, service accounts
+
+
+$leftoutdays = (Invoke-CimMethod -InputObject (Get-CimInstance -Namespace root/CIMV2/TerminalServices -ClassName Win32_TerminalServiceSetting) -MethodName GetGracePeriodDays).DaysLeft
+
+
+#Threshold set for number of days
+
+    if ($leftoutdays -le 15 )
+        { 
+            Write-Host "Only 5 days left for licensing"
+
+            Invoke-Command -ScriptBlock { aws sns publish --topic-arn arn:aws:sns:us-east-1:826859497240:Demo-GracePeriod-Alert-Check-Delete  --message "KINDLY ACTIVATE!! Only $leftoutdays days left for CAL licensing expiry!"}
+
+
+        }
+    else 
+        {
+            Write-Host "We have enough number of days"
+
+            Invoke-Command -ScriptBlock { aws sns publish --topic-arn arn:aws:sns:us-east-1:826859497240:Demo-GracePeriod-Alert-Check-Delete  --message " CAL License expires in $leftoutdays... We have enough number of days!!"}
+        }
+    
+
+
+
+ 
