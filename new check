@@ -1,0 +1,40 @@
+ $Servicename = "powershell*"
+$CounterPID = "\Process($Servicename*)\ID Process"
+$CounterCPU = "\Process(*)\% Processor Time"
+$CPULogPath = "C:\temp\"
+
+$filename="CPU-"+$env:COMPUTERNAME+"-"+(Get-Date).ToString("yyyy.MM.dd")+".txt"
+Get-Date | Out-File $($CPULogPath+$filename) -Append
+
+$processlist=@()
+$PIDList = (Get-Counter $CounterPID -ErrorAction SilentlyContinue).CounterSamples
+$CPUValues = (Get-Counter $CounterCPU -ErrorAction SilentlyContinue).CounterSamples |
+Where-Object {$PSItem.CookedValue -ge 0 -and $PSItem.InstanceName -notmatch ("idle|_total") }
+
+foreach ($CPUValue in $CPUValues) {
+$ProcName = $CPUValue.Path.Split("(")[1].Split(")")[0]
+foreach ($P in $PIDList) {
+$ProcessPID = $P.CookedValue
+$ProcessName = $P.Path.Split("(")[1].Split(")")[0]
+if ($ProcessName -eq $ProcName) {
+$commandline = get-wmiobject WIN32_PROCESS | Where-Object { $ProcessPID -eq $PSItem.ProcessId }
+$MyObject = "" | Select PID, "CPU%", MemUsageMB, ProcessName, Owner, CommandLine
+$MyObject."CPU%" = [Decimal]::Round(($CPUValue.CookedValue / $env:NUMBER_OF_PROCESSORS), 2)
+$MyObject.ProcessName = $commandline.ProcessName
+$MyObject.MemUsageMB = [math]::round($commandline.ws / 1mb) 
+$MyObject.Owner = $commandline.getowner().user
+$MyObject.PID = $ProcessPID
+$ProcessList+=$MyObject
+$MyObject.CommandLine = $commandline.CommandLine
+}
+}
+}
+
+$processlist | Sort-Object "CPU%" -Descending | ft -AutoSize | Out-String -Width "1000" | Out-File $($CPULogPath+$filename) -Append
+
+##########################################################################
+
+
+#$processMemoryUsage = Get-WmiObject WIN32_PROCESS | Where-Object -FilterScript {$_.ProcessName -EQ 'firefox.exe'} | Select-Object @{N="ProcessID";E={$_.ProcessId}}, @{N="Username";E={$_.getowner().user}}, CommandLine, processname, @{Name="Mem Usage(MB)";Expression={[math]::round($_.ws / 1mb)}} 
+
+#$processMemoryUsage 
