@@ -1,0 +1,68 @@
+ function Get-TimeStamp {
+    
+    return "[{0:MM/dd/yy} {0:HH:mm:ss}]" -f (Get-Date)
+    
+}
+
+
+
+"$(Get-TimeStamp) Collecting logs for users" | Out-File C:\Users\prakashp\test.txt -Append
+
+
+#if((Get-Process -Name firefox -ErrorAction SilentlyContinue -IncludeUserName | Where-Object -FilterScript {$_.UserName -EQ "SAS-SYCA-STAG\test" -or $_.UserName -EQ "SYCAMORE\Administrator"} ) -eq $Null){ 
+
+if((Get-Process -Name firefox -ErrorAction SilentlyContinue -IncludeUserName ) -eq $Null){ 
+
+ Add-Content C:\Users\prakashp\test.txt "---------------- NO PROCESSS RUNNING -------------------"
+ Add-Content C:\Users\prakashp\test.txt "--------------------------------------------------------" }
+
+ else {
+
+$file = Get-Process -Name firefox -IncludeUserName | Where-Object -FilterScript {$_.UserName -EQ "SAS-SYCA-STAG\test" -or $_.UserName -EQ "SYCAMORE\Administrator"} | Sort-Object UserName
+
+#$file
+
+$file | Out-File C:\Users\prakashp\test.txt -Append
+
+Add-Content C:\Users\prakashp\test.txt "----------------------------------------------------------"
+
+}
+
+
+(Get-Counter '\Process(*)\% Processor Time').CounterSamples | Where-Object {$_.CookedValue -gt 5}
+
+
+
+
+
+
+
+Get-Process | Select-Object -expand CPU | Measure-Object -Sum | Select-Object -expand Sum
+
+
+Get-WmiObject -Class win32_processor -ErrorAction Stop | Measure-Object -Property LoadPercentage 
+
+
+
+
+(Get-WmiObject -Class win32_processor -ErrorAction Stop | Measure-Object -Property LoadPercentage -Average | Select-Object Average).Average
+
+
+
+
+
+
+
+
+#Get-Process -Name firefox -IncludeUserName |Select-Object id, starttime, UserName, ProcessName  | ? {$_.starttime -lt (Get-Date).AddHours(-24)}|Sort-Object sas
+
+Get-Process  |Select-Object id, starttime, name| ? {$_.starttime -lt (Get-Date).AddHours(-24)} | Sort-Object sas
+
+
+
+(Get-Counter '\Process(*)\% Processor Time').CounterSamples | Select-Object firefox
+
+
+ | Where-Object {$_.CookedValue -gt 5}
+
+ 
