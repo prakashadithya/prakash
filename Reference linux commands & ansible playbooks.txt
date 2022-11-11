@@ -1,6 +1,3 @@
-/var/log/dnf.log
-
-
 sed -e 's/[./ ]/ /g;s/  */ /g' /var/log/dnf.log > /var/tmp/files1.txt
 
 
