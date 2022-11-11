@@ -1,5 +1,3 @@
-:5nej;V*/P,Or8U
-
 /var/log/dnf.log
 
 
