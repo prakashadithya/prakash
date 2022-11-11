@@ -1,0 +1,46 @@
+:5nej;V*/P,Or8U
+
+/var/log/dnf.log
+
+
+sed -e 's/[./ ]/ /g;s/  */ /g' /var/log/dnf.log > /var/tmp/files1.txt
+
+
+sed -n '1,10p' /var/log/dnf.log > /var/tmp/files.txt
+sed '1d' /var/tmp/files.txt > /var/tmp/files1.txt
+
+
+Adithya's requirement - 1
+-------------------------
+sed -n '/<keyword>/p' /var/log/dnf.log | cut -d "<Splitting character>" -f 1   # Filter the keyword from the file and display the required field
+ex:
+sed -n '/error/p' /var/log/dnf.log | cut -d "T" -f 1   # Filter the error keyword from the file dnf.log and display the date field
+
+Adithya's requirement - 2
+--------------------------
+sed -i '$d' <file>    # to edit in place
+sed -i -e :a -e '$d;N;2,5ba' -e 'P;D' test    # Delete last 5 lines in test file
+
+Adithya's requirement - 3     # Adding few lines in end of the file in remote server
+-------------------------
+ - name: this is directory
+   hosts: all
+   tasks:
+
+     - name: Create a file
+       file:
+         path: /tmp/prakash
+         state: touch
+
+     - name: Add mappings to /etc/hosts
+       lineinfile:
+         path: /tmp/prakash
+         line: 'This is the ansible class'
+
+     - name: add lines
+       lineinfile:
+         dest: /tmp/prakash
+         line: '{{ item }}'
+       with_items:
+         - 'Welcome'
+         - 'All the best'
